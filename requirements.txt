@@ -1,0 +1,21 @@
+tssm-ai/
+│
+├── app/
+│   ├── main.py
+│   │
+│   ├── tutor/              → router.py, service.py, prompt.py
+│   ├── summarization/       → router.py, service.py, prompt.py
+│   ├── unit_explanation/    → router.py, service.py, prompt.py
+│   ├── material_qa/         → router.py, service.py, prompt.py
+│   ├── exam_answer/         → router.py, service.py, prompt.py
+│   │
+│   ├── core/                → llm.py
+│   ├── rag/                 → loader.py, extractor.py, chunker.py, embeddings.py, retriever.py, vector_store.py
+│   ├── tssm/                 → course.py, subject.py, unit.py, material.py
+│   └── models/               → request/response schemas (new)
+│
+├── tests/
+├── requirements.txt
+├── .env
+├── Dockerfile
+└── README.md
