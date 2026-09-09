@@ -1,11 +1,13 @@
 from flask import Flask
 
 from app.tutor.router import tutor_router
+from app.unit_explanation.router import unit_explanation_router
 
 
 app = Flask(__name__)
 
 app.register_blueprint(tutor_router)
+app.register_blueprint(unit_explanation_router)
 
 
 @app.route("/")

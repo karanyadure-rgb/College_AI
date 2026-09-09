@@ -93,7 +93,7 @@ if st.session_state.get("mode") == "tutor":
 
 
 # -----------------------------
-# OTHER MODES
+# SUMMARIZE AI
 # -----------------------------
 
 st.divider()
@@ -106,14 +106,91 @@ if st.button(
 ):
     st.info("Summarization will be added next.")
 
+# -----------------------------
+# EXPLAIN AI
+# -----------------------------
 
 st.markdown("### 📚 Explain Unit")
 
 if st.button(
-    "Understand a topic easily",
+    "Understand a unit easily",
     use_container_width=True
 ):
-    st.info("Unit Explanation will be added next.")
+    st.session_state["mode"] = "unit_explanation"
+
+if st.session_state.get("mode") == "unit_explanation":
+
+    st.divider()
+
+    st.subheader("📚 Unit Explanation")
+
+    subject = st.text_input(
+        "Subject",
+        placeholder="Example: Software Engineering"
+    )
+
+    unit = st.text_input(
+        "Unit",
+        placeholder="Example: Unit II - Software Requirement Engineering"
+    )
+
+    topics = st.text_area(
+        "Syllabus Topics",
+        placeholder="Enter the official syllabus topics here..."
+    )
+
+    if st.button("Explain Unit", use_container_width=True):
+
+        if not subject.strip():
+            st.warning("Please enter the subject.")
+
+        elif not unit.strip():
+            st.warning("Please enter the unit.")
+
+        elif not topics.strip():
+            st.warning("Please enter the syllabus topics.")
+
+        else:
+
+            try:
+
+                topic_list = [
+                    topic.strip()
+                    for topic in topics.split("\n")
+                    if topic.strip()
+                ]
+
+                response = requests.post(
+                    "http://127.0.0.1:5000/api/unit-explanation",
+                    json={
+                        "subject": subject,
+                        "unit": unit,
+                        "topics": topic_list
+                    }
+                )
+
+                if response.status_code == 200:
+
+                    data = response.json()
+
+                    st.success("Unit Explanation")
+
+                    st.markdown(
+                        data["explanation"]
+                    )
+
+                else:
+
+                    st.error(
+                        f"Backend error: {response.status_code}"
+                    )
+
+            except requests.exceptions.ConnectionError:
+
+                st.error(
+                    "Cannot connect to Flask. "
+                    "Make sure your Flask server is running."
+                )
 
 
 st.markdown("### ✍️ Exam Answer")
