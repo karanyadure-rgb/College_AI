@@ -2,6 +2,10 @@ import streamlit as st
 import requests
 
 
+# --------------------------------------------------
+# PAGE CONFIGURATION
+# --------------------------------------------------
+
 st.set_page_config(
     page_title="TSSM LearnSync",
     page_icon="🤖",
@@ -9,41 +13,109 @@ st.set_page_config(
 )
 
 
-# -----------------------------
-# HOME
-# -----------------------------
+# --------------------------------------------------
+# CUSTOM CSS
+# --------------------------------------------------
 
-st.title("TSSM LearnSync")
-st.write("Your AI Study Companion")
+st.markdown(
+    """
+    <style>
 
-st.markdown("## Hello, Karan 👋")
-st.write("What do you want to do today?")
+    .ky-logo {
+        width: 55px;
+        height: 55px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #123B78, #2563EB);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+
+    .logo-title {
+        font-size: 22px;
+        font-weight: 700;
+        color: #123B78;
+        margin-bottom: 25px;
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 
-# -----------------------------
-# AI TUTOR
-# -----------------------------
+# --------------------------------------------------
+# SIDEBAR
+# --------------------------------------------------
 
-st.markdown("### 🤖 AI Tutor")
-st.write("Ask any question about your studies.")
+with st.sidebar:
 
-if st.button("Ask a Question", use_container_width=True):
+    st.markdown(
+        '<div class="ky-logo">KY</div>',
+        unsafe_allow_html=True
+    )
 
+    st.markdown(
+        '<div class="logo-title">TSSM LearnSync</div>',
+        unsafe_allow_html=True
+    )
+
+    st.markdown("### AI Features")
+
+    if st.button(
+        "🤖 AI Tutor",
+        use_container_width=True
+    ):
+        st.session_state["mode"] = "tutor"
+
+    if st.button(
+        "📚 Unit Explanation",
+        use_container_width=True
+    ):
+        st.session_state["mode"] = "unit_explanation"
+
+    if st.button(
+        "✍️ Exam Answer",
+        use_container_width=True
+    ):
+        st.session_state["mode"] = "exam_answer"
+
+    if st.button(
+        "📝 Summarizer",
+        use_container_width=True
+    ):
+        st.session_state["mode"] = "summarizer"
+
+
+# --------------------------------------------------
+# DEFAULT MODE
+# --------------------------------------------------
+
+if "mode" not in st.session_state:
     st.session_state["mode"] = "tutor"
 
 
-# -----------------------------
-# TUTOR SCREEN
-# -----------------------------
+# ==================================================
+# AI TUTOR
+# ==================================================
 
-if st.session_state.get("mode") == "tutor":
+if st.session_state["mode"] == "tutor":
+
+    st.title("🤖 AI Tutor")
+
+    st.write(
+        "Ask questions and get clear explanations "
+        "from your AI study assistant."
+    )
 
     st.divider()
 
-    st.subheader("🤖 AI Tutor")
-
     question = st.text_area(
-        "Ask your question",
+        "Your Question",
         placeholder="Example: What is an operating system?"
     )
 
@@ -52,7 +124,10 @@ if st.session_state.get("mode") == "tutor":
         placeholder="Example: Operating System Unit 1"
     )
 
-    if st.button("Get Answer", use_container_width=True):
+    if st.button(
+        "Get Answer",
+        use_container_width=True
+    ):
 
         if not question.strip():
 
@@ -76,7 +151,7 @@ if st.session_state.get("mode") == "tutor":
 
                     st.success("Answer")
 
-                    st.write(data["answer"])
+                    st.markdown(data["answer"])
 
                 else:
 
@@ -92,37 +167,20 @@ if st.session_state.get("mode") == "tutor":
                 )
 
 
-# -----------------------------
-# SUMMARIZE AI
-# -----------------------------
+# ==================================================
+# UNIT EXPLANATION
+# ==================================================
 
-st.divider()
+elif st.session_state["mode"] == "unit_explanation":
 
-st.markdown("### 📝 Summarize")
+    st.title("📚 Unit Explanation")
 
-if st.button(
-    "Make your notes shorter",
-    use_container_width=True
-):
-    st.info("Summarization will be added next.")
-
-# -----------------------------
-# EXPLAIN AI
-# -----------------------------
-
-st.markdown("### 📚 Explain Unit")
-
-if st.button(
-    "Understand a unit easily",
-    use_container_width=True
-):
-    st.session_state["mode"] = "unit_explanation"
-
-if st.session_state.get("mode") == "unit_explanation":
+    st.write(
+        "Understand your complete syllabus unit "
+        "in simple and exam-oriented language."
+    )
 
     st.divider()
-
-    st.subheader("📚 Unit Explanation")
 
     subject = st.text_input(
         "Subject",
@@ -135,19 +193,33 @@ if st.session_state.get("mode") == "unit_explanation":
     )
 
     topics = st.text_area(
-        "Syllabus Topics",
-        placeholder="Enter the official syllabus topics here..."
+        "Official Syllabus Topics",
+        placeholder=(
+            "Enter each syllabus topic on a new line.\n\n"
+            "Example:\n"
+            "2.1 Software Engineering Core Principles\n"
+            "2.2 Software Practices\n"
+            "2.3 Requirement Engineering\n"
+            "2.4 Software Requirement Specification"
+        ),
+        height=180
     )
 
-    if st.button("Explain Unit", use_container_width=True):
+    if st.button(
+        "Explain Unit",
+        use_container_width=True
+    ):
 
         if not subject.strip():
+
             st.warning("Please enter the subject.")
 
         elif not unit.strip():
+
             st.warning("Please enter the unit.")
 
         elif not topics.strip():
+
             st.warning("Please enter the syllabus topics.")
 
         else:
@@ -193,10 +265,99 @@ if st.session_state.get("mode") == "unit_explanation":
                 )
 
 
-st.markdown("### ✍️ Exam Answer")
+# ==================================================
+# EXAM ANSWER
+# ==================================================
 
-if st.button(
-    "Generate exam-ready answer",
-    use_container_width=True
-):
-    st.info("Exam Answer Generation will be added next.")
+elif st.session_state["mode"] == "exam_answer":
+
+    st.title("✍️ Exam Answer Generator")
+
+    st.write(
+        "Generate exam-ready answers according "
+        "to the marks."
+    )
+
+    st.divider()
+
+    question = st.text_area(
+        "Enter your question",
+        placeholder=(
+            "Example: What is Software Requirement Specification?"
+        )
+    )
+
+    marks = st.selectbox(
+        "Select Marks",
+        [2, 4, 6]
+    )
+
+    context = st.text_input(
+        "Context (optional)",
+        placeholder="Example: Software Engineering Unit II"
+    )
+
+    if st.button(
+        "Generate Answer",
+        use_container_width=True
+    ):
+
+        if not question.strip():
+
+            st.warning("Please enter a question.")
+
+        else:
+
+            try:
+
+                response = requests.post(
+                    "http://127.0.0.1:5000/api/exam-answer",
+                    json={
+                        "question": question,
+                        "marks": marks,
+                        "context": context
+                    }
+                )
+
+                if response.status_code == 200:
+
+                    data = response.json()
+
+                    st.success("Exam-ready Answer")
+
+                    st.markdown(
+                        data["answer"]
+                    )
+
+                else:
+
+                    st.error(
+                        f"Backend error: {response.status_code}"
+                    )
+
+            except requests.exceptions.ConnectionError:
+
+                st.error(
+                    "Cannot connect to Flask. "
+                    "Make sure your Flask server is running."
+                )
+
+
+# ==================================================
+# SUMMARIZER
+# ==================================================
+
+elif st.session_state["mode"] == "summarizer":
+
+    st.title("📝 Summarizer")
+
+    st.write(
+        "Convert your study material into "
+        "short and easy-to-revise notes."
+    )
+
+    st.divider()
+
+    st.info(
+        "Summarization will be added next."
+    )
