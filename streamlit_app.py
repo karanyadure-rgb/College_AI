@@ -352,12 +352,110 @@ elif st.session_state["mode"] == "summarizer":
     st.title("📝 Summarizer")
 
     st.write(
-        "Convert your study material into "
-        "short and easy-to-revise notes."
+        "Summarize your study material into "
+        "clear and easy-to-revise notes."
     )
 
     st.divider()
 
-    st.info(
-        "Summarization will be added next."
+    # Text input area
+    text = st.text_area(
+        "Study Material",
+        placeholder=(
+            "Paste your study material here..."
+        ),
+        height=220
     )
+
+    # Add file button
+    col1, col2 = st.columns([8, 1])
+
+    with col2:
+        add_file = st.button(
+            "+",
+            help="Upload PDF or DOCX"
+        )
+
+    uploaded_file = None
+
+    if add_file:
+
+        uploaded_file = st.file_uploader(
+            "Upload study material",
+            type=["pdf", "docx"],
+            label_visibility="collapsed"
+        )
+
+    summary_length = st.selectbox(
+        "Summary Length",
+        ["short", "medium", "detailed"],
+        index=1
+    )
+
+    if st.button(
+        "Generate Summary",
+        use_container_width=True
+    ):
+
+        if not text.strip() and uploaded_file is None:
+
+            st.warning(
+                "Please paste text or upload a PDF/DOCX file."
+            )
+
+        else:
+
+            try:
+
+                files = None
+                data = {
+                    "summary_length": summary_length
+                }
+
+                if uploaded_file:
+
+                    files = {
+                        "file": (
+                            uploaded_file.name,
+                            uploaded_file.getvalue(),
+                            uploaded_file.type
+                        )
+                    }
+
+                else:
+
+                    data["text"] = text
+
+                response = requests.post(
+                    "http://127.0.0.1:5000/api/summarize",
+                    data=data,
+                    files=files
+                )
+
+                if response.status_code == 200:
+
+                    result = response.json()
+
+                    st.success("Summary")
+
+                    st.markdown(
+                        result["summary"]
+                    )
+
+                else:
+
+                    error = response.json()
+
+                    st.error(
+                        error.get(
+                            "error",
+                            "Something went wrong."
+                        )
+                    )
+
+            except requests.exceptions.ConnectionError:
+
+                st.error(
+                    "Cannot connect to Flask. "
+                    "Make sure your Flask server is running."
+                )
