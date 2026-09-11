@@ -1,10 +1,12 @@
 from flask import Blueprint, request, jsonify
 from app.exam_answer.service import generate_exam_answer
 
+
 exam_answer_router = Blueprint(
     "exam_answer",
     __name__
 )
+
 
 @exam_answer_router.route(
     "/api/exam-answer",
@@ -20,12 +22,12 @@ def exam_answer():
 
     if not question:
         return jsonify({
-            "error":"Question is required"
+            "error": "Question is required"
         }), 400
 
-    if not marks:
+    if marks not in [2, 4, 6]:
         return jsonify({
-            "error": "Marks are required"
+            "error": "Marks must be 2, 4, or 6"
         }), 400
 
     answer = generate_exam_answer(
